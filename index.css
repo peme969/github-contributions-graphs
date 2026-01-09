@@ -1,62 +1,336 @@
-@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap");
 :root {
-  --background: #101217;
-  --text: #ffffff;
-  --grade4: #39d353;
-  --grade3: #26a641;
-  --grade2: #006d32;
-  --grade1: #0e4429;
-  --grade0: #151B23;
-  font-family: "Indie Flower", cursive;
-  font-weight: 400;
-  font-style: normal;
+    font-family: "Indie Flower", cursive;
+    font-weight: 400;
+    font-style: normal;
 }
-.leftPad {
-  --background: #000000;
-  --text: #f8f8f2;
-  --grade4: #F6F6F6;
-  --grade3: #DDDDDD;
-  --grade2: #A5A5A5;
-  --grade1: #646464;
-  --grade0: #2F2F2F;
+body {
+    font-family:
+        system-ui,
+        -apple-system,
+        Segoe UI,
+        Roboto,
+        sans-serif;
+    margin: 20px;
+    background: #0b0d10;
+    color: white;
 }
 
-.dracula {
-  --background: #181818;
-  --text: #f8f8f2;
-  --grade4: #ff79c6;
-  --grade3: #bd93f9;
-  --grade2: #6272a4;
-  --grade1: #44475a;
-  --grade0: #282a36;
+h1 {
+    margin-bottom: 15px;
 }
 
-.blue {
-  --background: #181818;
-  --text: #C0C0C0;
-  --grade4: #4F83BF;
-  --grade3: #416895;
-  --grade2: #344E6C;
-  --grade1: #263342;
-  --grade0: #222222;
+.year-section {
+    margin-top: 40px;
 }
 
-.panda {
-  --background: #2B2C2F;
-  --text: #E6E6E6;
-  --grade4: #FF4B82;
-  --grade3: #19f9d8;
-  --grade2: #6FC1FF;
-  --grade1: #34353B;
-  --grade0: #242526;
+.year-section h2 {
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 16px;
 }
 
-.solarizedDark {
-  --background: #002b36;
-  --text: #93a1a1;
-  --grade4: #d33682;
-  --grade3: #b58900;
-  --grade2: #2aa198;
-  --grade1: #268bd2;
-  --grade0: #073642;
+/* Table-like grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
 }
+
+/* Card container for each theme */
+.theme-card {
+    background: #111318;
+    border: 1px solid #2b2f3a;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Wrap for SVG */
+.svg-wrap {
+    width: 100%;
+    overflow-x: auto;
+    padding: 8px;
+    background: #0c0e13;
+    border-radius: 10px;
+    border: 1px solid #222;
+    display: flex;
+    justify-content: center;
+}
+
+.theme-name {
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #c7d0ff;
+}
+
+/* Error card styling */
+.error-card {
+    border: 1px solid #a33;
+    background: #2a1111;
+}
+
+.error-msg {
+    font-size: 13px;
+    color: #ffbebe;
+}
+/* Hover highlight effect */
+svg .day-cell {
+    cursor: pointer;
+    transition: filter 0.08s ease, stroke 0.08s ease;
+    vector-effect: non-scaling-stroke; /* stroke width stays stable when zooming */
+  }
+  
+  svg .day-cell:hover {
+    filter: brightness(1.35) drop-shadow(0px 0px 3px rgba(255,255,255,0.25));
+    stroke: #ffffff;
+    stroke-width: 1;
+  }
+  
+  /* Tooltip box (HTML overlay) */
+  #tooltip {
+    position: absolute;
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.08s ease;
+    white-space: nowrap;
+    z-index: 9999;
+  }
+  svg {
+    overflow: visible;
+  }
+  .svg-wrap svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  body {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  /* Main container: vertical layout */
+  #graphs {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  
+  /* Each year block stacked vertically */
+  .year-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Year title styling */
+  .year-section h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #e6edf3;
+  }
+  
+  /* Graphs inside each year: vertical stacking */
+  .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  
+  /* Each theme card */
+  .theme-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 12px;
+    border-radius: 12px;
+    overflow: visible;
+  }
+  
+  /* SVG wrapper ensures no zoom/crop */
+  .svg-wrap {
+    width: 100%;
+    overflow: visible;
+  }
+  
+  /* ✅ Make SVG responsive */
+  .svg-wrap svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  /* Theme name below */
+  .theme-name {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #8b949e;
+    text-align: center;
+  }
+  .theme-card {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 18px;
+  }
+  .theme-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  
+  .download-btn:hover {
+    background: #161b22;
+  }
+  
+  .download-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: #8b949e;
+  }
+  
+  .download-btn:hover svg {
+    fill: #e6edf3;
+  }
+  .download-btn svg {
+    fill: #8b949e;
+  }
+  
+  .download-btn:hover svg {
+    fill: #e6edf3;
+  }
+  .export-select {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+  }
+  
+  .export-select:hover {
+    background: #161b22;
+  }
+  
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  
+  .copy-btn:hover {
+    background: #161b22;
+  }
+  
+  .copy-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: #8b949e;
+  }
+  
+  .copy-btn:hover svg {
+    fill: #e6edf3;
+  }
+  .theme-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* ✅ name on left, controls on right */
+    gap: 12px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  
+  /* Left side theme title */
+  .theme-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #c9d1d9;
+    line-height: 1;
+    padding: 4px 0;
+    min-width: 120px; /* keeps it stable */
+  }
+  
+  /* Right-side controls grouped neatly */
+  .theme-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #toast {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 999999;
+  }
+  
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px);
+  }
+  .export-select {
+    height: 28px;
+    padding: 0 10px;
+    line-height: 28px;
+  }
+  .theme-card {
+    overflow: visible; /* ✅ important */
+  }
+  .svg-wrap {
+    overflow: visible; /* ✅ important */
+  }
+    
