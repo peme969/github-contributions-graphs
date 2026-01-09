@@ -1,5 +1,5 @@
 # github-contributions-graphs
-A simple page that generates a contribution graph for your contributions since you signed up.
+Now, you will be able to download a contribution graph for each year or a chart that includes all of the graphs per year... with themes!!
 
 
 #### inspired by:
