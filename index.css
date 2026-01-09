@@ -1,12 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
 :root {
   --background: #101217;
-  --text: #ffffff,
-  --grade4: #39d353,
-  --grade3: #26a641,
-  --grade2: #006d32,
-  --grade1: #0e4429,
-  --grade0: #151B23
+  --text: #ffffff;
+  --grade4: #39d353;
+  --grade3: #26a641;
+  --grade2: #006d32;
+  --grade1: #0e4429;
+  --grade0: #151B23;
+  font-family: "Indie Flower", cursive;
+  font-weight: 400;
+  font-style: normal;
 }
 .leftPad {
   --background: #000000;
