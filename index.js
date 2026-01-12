@@ -1,5 +1,3 @@
-console.log("octicons:", window.octicons);
-
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -255,22 +253,7 @@ async function copySVGToClipboard(svgText) {
 
 (async function () {
   const username = "peme969";
-  function getDownloadOcticonSVG() {
-    // GitHub Octicon "download" (16px)
-    return `
-      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-        <path d="M7.25 1.5a.75.75 0 0 1 1.5 0v6.69l2.22-2.22a.75.75 0 1 1 1.06 1.06l-3.5 3.5a.75.75 0 0 1-1.06 0l-3.5-3.5A.75.75 0 1 1 5.03 5.97l2.22 2.22V1.5ZM2.75 13a.75.75 0 0 1 .75-.75h9a.75.75 0 0 1 0 1.5h-9A.75.75 0 0 1 2.75 13Z"></path>
-      </svg>
-    `;
-  }
-  function getCopyOcticonSVG() {
-    return `
-      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-        <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
-        <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5c0 .966-.784 1.75-1.75 1.75h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
-      </svg>
-    `;
-  }
+  
   
   const YEARS_URL = `https://github-contribution-graph-generator.vercel.app/graph/years/${username}`;
   const POST_URL = `https://github-contribution-graph-generator.vercel.app/custom/${username}`;
@@ -367,7 +350,6 @@ function bindTooltips(scopeEl) {
     const svgWrap = document.createElement("div");
     svgWrap.className = "svg-wrap";
     svgWrap.innerHTML = svgText;
-    console.log("renderCard:", year, themeName);
 
     // Bind tooltip listeners
     bindTooltips(svgWrap);
