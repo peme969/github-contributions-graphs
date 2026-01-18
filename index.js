@@ -19,61 +19,63 @@ async function svgWrapToPngBlob(svgWrap, bgColor = "#0d1117", scale = 2) {
   if (!svgEl) throw new Error("SVG not found");
 
   const clone = svgEl.cloneNode(true);
-  
+
   // ✅ Remove style/title/metadata/desc
-clone.querySelectorAll("style, title, desc, metadata").forEach((n) => n.remove());
+  clone
+    .querySelectorAll("style, title, desc, metadata")
+    .forEach((n) => n.remove());
 
-// ✅ Remove <a> elements (replace with inner text)
-clone.querySelectorAll("a").forEach((a) => {
-  const t = a.querySelector("text");
-  if (t) a.replaceWith(t);
-  else a.remove();
-});
-
-// ✅ Remove ALL data-* attributes (SAFE method)
-clone.querySelectorAll("*").forEach((el) => {
-  Array.from(el.attributes).forEach((attr) => {
-    if (attr.name.startsWith("data-")) {
-      el.removeAttribute(attr.name);
-    }
+  // ✅ Remove <a> elements (replace with inner text)
+  clone.querySelectorAll("a").forEach((a) => {
+    const t = a.querySelector("text");
+    if (t) a.replaceWith(t);
+    else a.remove();
   });
-});
 
-// ✅ Serialize
-let svgText = new XMLSerializer().serializeToString(clone);
+  // ✅ Remove ALL data-* attributes (SAFE method)
+  clone.querySelectorAll("*").forEach((el) => {
+    Array.from(el.attributes).forEach((attr) => {
+      if (attr.name.startsWith("data-")) {
+        el.removeAttribute(attr.name);
+      }
+    });
+  });
 
-// ✅ Strip invalid XML control characters
-svgText = stripInvalidXmlChars(svgText);
+  // ✅ Serialize
+  let svgText = new XMLSerializer().serializeToString(clone);
 
-// ✅ Fix raw ampersands
-svgText = svgText.replace(
-  /&(?!amp;|lt;|gt;|quot;|apos;|#\d+;|#x[0-9a-fA-F]+;)/g,
-  "&amp;"
-);
+  // ✅ Strip invalid XML control characters
+  svgText = stripInvalidXmlChars(svgText);
 
-// ✅ HARD sanitize quotes inside attributes (last resort)
-svgText = svgText.replace(/="([^"]*)"/g, (m, p1) => {
-  const safe = p1.replace(/"/g, "&quot;");
-  return `="${safe}"`;
-});
+  // ✅ Fix raw ampersands
+  svgText = svgText.replace(
+    /&(?!amp;|lt;|gt;|quot;|apos;|#\d+;|#x[0-9a-fA-F]+;)/g,
+    "&amp;",
+  );
 
-// Debug exact slice near failure
-console.log("SVG length:", svgText.length);
-console.log("SVG slice near error:", svgText.slice(37036 - 200, 37036 + 200));
+  // ✅ HARD sanitize quotes inside attributes (last resort)
+  svgText = svgText.replace(/="([^"]*)"/g, (m, p1) => {
+    const safe = p1.replace(/"/g, "&quot;");
+    return `="${safe}"`;
+  });
 
-// ✅ Validate
-const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
-const err = doc.querySelector("parsererror");
-if (err) {
-  console.error("SVG parse error:", err.textContent);
-  throw new Error("SVG invalid XML — cannot render image");
-}
+  // Debug exact slice near failure
+  console.log("SVG length:", svgText.length);
+  console.log("SVG slice near error:", svgText.slice(37036 - 200, 37036 + 200));
 
+  // ✅ Validate
+  const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
+  const err = doc.querySelector("parsererror");
+  if (err) {
+    console.error("SVG parse error:", err.textContent);
+    throw new Error("SVG invalid XML — cannot render image");
+  }
 
   // ✅ Determine size from viewBox or width/height
   const viewBox = clone.viewBox.baseVal;
   const width = parseInt(clone.getAttribute("width")) || viewBox.width || 1200;
-  const height = parseInt(clone.getAttribute("height")) || viewBox.height || 400;
+  const height =
+    parseInt(clone.getAttribute("height")) || viewBox.height || 400;
 
   const svgDataUrl =
     "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgText);
@@ -147,34 +149,41 @@ async function downloadPNG(svgWrap, filename, bgColor = "#0d1117") {
     });
   });
   // Remove any lingering title attributes too
-clone.querySelectorAll("*").forEach((el) => {
-  Array.from(el.attributes).forEach((attr) => {
-    if (attr.name.toLowerCase() === "title") {
-      el.removeAttribute(attr.name);
-    }
+  clone.querySelectorAll("*").forEach((el) => {
+    Array.from(el.attributes).forEach((attr) => {
+      if (attr.name.toLowerCase() === "title") {
+        el.removeAttribute(attr.name);
+      }
+    });
   });
-});
-  
+
   // ✅ Convert to clean SVG string
   const svgText = new XMLSerializer().serializeToString(clone);
   svgText = svgText.replace(/data-tooltip="([^"]*)"/g, (m, p1) => {
-    return `data-tooltip="${p1.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}"`;
+    return `data-tooltip="${p1.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}"`;
   });
-  
+
   const errorIndex = 37036; // from the parser error
-console.log("SVG slice near error:", svgText.slice(errorIndex - 200, errorIndex + 200));
+  console.log(
+    "SVG slice near error:",
+    svgText.slice(errorIndex - 200, errorIndex + 200),
+  );
 
   // ✅ Parse test (this catches hidden XML issues)
   const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
   if (doc.querySelector("parsererror")) {
-    console.error("SVG parse error:", doc.querySelector("parsererror").textContent);
+    console.error(
+      "SVG parse error:",
+      doc.querySelector("parsererror").textContent,
+    );
     throw new Error("SVG is invalid XML — cannot export PNG");
   }
 
   // ✅ Determine size
   const viewBox = clone.viewBox.baseVal;
   const width = parseInt(clone.getAttribute("width")) || viewBox.width || 1200;
-  const height = parseInt(clone.getAttribute("height")) || viewBox.height || 400;
+  const height =
+    parseInt(clone.getAttribute("height")) || viewBox.height || 400;
 
   // ✅ Make image-safe data URL (NO base64 issues)
   const svgDataUrl =
@@ -219,9 +228,6 @@ console.log("SVG slice near error:", svgText.slice(errorIndex - 200, errorIndex 
   img.src = svgDataUrl;
 }
 
-
-
-
 function svgToJSON(svgWrap) {
   const svg = svgWrap.querySelector("svg");
   if (!svg) return {};
@@ -252,66 +258,56 @@ async function copySVGToClipboard(svgText) {
 }
 
 (async function () {
-  const username = "peme969";
-  function getDownloadOcticonSVG() {
-    // GitHub Octicon "download" (16px)
-    return `
-      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-        <path d="M7.25 1.5a.75.75 0 0 1 1.5 0v6.69l2.22-2.22a.75.75 0 1 1 1.06 1.06l-3.5 3.5a.75.75 0 0 1-1.06 0l-3.5-3.5A.75.75 0 1 1 5.03 5.97l2.22 2.22V1.5ZM2.75 13a.75.75 0 0 1 .75-.75h9a.75.75 0 0 1 0 1.5h-9A.75.75 0 0 1 2.75 13Z"></path>
-      </svg>
-    `;
-  }
-  function getCopyOcticonSVG() {
-    return `
-      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-        <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
-        <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5c0 .966-.784 1.75-1.75 1.75h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
-      </svg>
-    `;
-  }
-  
-  const YEARS_URL = `https://github-contribution-graph-generator.vercel.app/graph/years/${username}`;
-  const POST_URL = `https://github-contribution-graph-generator.vercel.app/custom/${username}`;
-
-  const container = document.getElementById("graphs");
+  // UI elements
+  const usernameInput = document.getElementById("usernameInput");
+  const loadBtn = document.getElementById("loadBtn");
+  const themeSelect = document.getElementById("themeSelect");
+  const yearSelect = document.getElementById("yearSelect");
+  const graphDisplay = document.getElementById("graphDisplay");
+  const statusEl = document.getElementById("status");
   const tooltip = document.getElementById("tooltip");
-  function downloadSVG(svgText, filename) {
-    const blob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
-    downloadBlob(blob, filename);
+
+  // Cache: { [year]: { [themeName]: svgText } }
+  let svgCache = {};
+
+  function setStatus(text) {
+    if (!statusEl) return;
+    statusEl.textContent = text || "";
   }
-  
-  
-function bindTooltips(scopeEl) {
-  const cells = scopeEl.querySelectorAll(".day-cell");
-  cells.forEach((cell) => {
-    cell.addEventListener("mousemove", (e) => {
-      const text = cell.getAttribute("data-tooltip");
-      if (!text) return;
 
-      tooltip.textContent = text;
-      tooltip.style.opacity = "1";
+  function setPlaceholder(text) {
+    graphDisplay.innerHTML = `<div class="placeholder">${text}</div>`;
+  }
 
-      // Position tooltip near cursor
-      let x = e.pageX + 12;
-      let y = e.pageY - 28;
+  function bindTooltips(scopeEl) {
+    const cells = scopeEl.querySelectorAll(".day-cell");
+    cells.forEach((cell) => {
+      cell.addEventListener("mousemove", (e) => {
+        const text = cell.getAttribute("data-tooltip");
+        if (!text) return;
 
-      // Keep tooltip within viewport
-      const rect = tooltip.getBoundingClientRect();
-      const maxX = window.scrollX + window.innerWidth - rect.width - 10;
-      const maxY = window.scrollY + window.innerHeight - rect.height - 10;
+        tooltip.textContent = text;
+        tooltip.style.opacity = "1";
 
-      if (x > maxX) x = maxX;
-      if (y > maxY) y = maxY;
+        let x = e.pageX + 12;
+        let y = e.pageY - 28;
 
-      tooltip.style.left = x + "px";
-      tooltip.style.top = y + "px";
+        const rect = tooltip.getBoundingClientRect();
+        const maxX = window.scrollX + window.innerWidth - rect.width - 10;
+        const maxY = window.scrollY + window.innerHeight - rect.height - 10;
+
+        if (x > maxX) x = maxX;
+        if (y > maxY) y = maxY;
+
+        tooltip.style.left = x + "px";
+        tooltip.style.top = y + "px";
+      });
+
+      cell.addEventListener("mouseleave", () => {
+        tooltip.style.opacity = "0";
+      });
     });
-
-    cell.addEventListener("mouseleave", () => {
-      tooltip.style.opacity = "0";
-    });
-  });
-}
+  }
 
   function getPalette(themeObj) {
     return {
@@ -323,195 +319,135 @@ function bindTooltips(scopeEl) {
     };
   }
 
-  function createYearSection(year) {
-    const section = document.createElement("section");
-    section.className = "year-section";
-
-    const title = document.createElement("h2");
-    title.textContent = `Year ${year}`;
-
-    const grid = document.createElement("div");
-    grid.className = "grid";
-
-    section.appendChild(title);
-    section.appendChild(grid);
-    container.appendChild(section);
-
-    return grid;
+  async function fetchYears(username) {
+    const YEARS_URL = `https://github-contribution-graph-generator.vercel.app/graph/years/${username}`;
+    const yearsRes = await fetch(YEARS_URL);
+    if (!yearsRes.ok) throw new Error(`GET years failed (${yearsRes.status})`);
+    const yearsData = await yearsRes.json();
+    return yearsData.years_in_git || [];
   }
 
-  async function fetchSVG(year, palette, themeName) {
-    const payload = {
-      palette,
-    };
-
-    const res = await fetch(POST_URL+"?year="+year, {
+  async function fetchSVGFor(username, year, palette) {
+    const POST_URL = `https://github-contribution-graph-generator.vercel.app/custom/${username}`;
+    const payload = { palette };
+    const res = await fetch(POST_URL + "?year=" + year, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-
-    if (!res.ok) {
-      throw new Error(`POST failed (${res.status})`);
-    }
-
-    return await res.text(); // SVG string
+    if (!res.ok) throw new Error(`POST failed (${res.status})`);
+    return await res.text();
   }
 
-  function renderCard(grid, year, themeName, svgText) {
-    const card = document.createElement("div");
-    card.className = "theme-card";
-  
+  function fillSelect(selectEl, options) {
+    selectEl.innerHTML = "";
+    for (const v of options) {
+      const opt = document.createElement("option");
+      opt.value = String(v);
+      opt.textContent = String(v);
+      selectEl.appendChild(opt);
+    }
+  }
+
+  function renderSelected() {
+    const themeName = themeSelect.value;
+    const year = yearSelect.value;
+    if (!themeName || !year) return;
+
+    const svgText = svgCache?.[year]?.[themeName];
+    if (!svgText) {
+      setPlaceholder("Graph not loaded yet.");
+      return;
+    }
+
     const svgWrap = document.createElement("div");
     svgWrap.className = "svg-wrap";
     svgWrap.innerHTML = svgText;
 
-    // Bind tooltip listeners
+    graphDisplay.innerHTML = "";
+    graphDisplay.appendChild(svgWrap);
     bindTooltips(svgWrap);
-    const toast = document.getElementById("toast");
-let toastTimer = null;
-
-function showToast(message) {
-  if (!toast) return;
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 1200);
-}
-
-    // Row under graph: theme name + dropdown + download + copy
-    const nameRow = document.createElement("div");
-    nameRow.className = "theme-name-row";
-  
-    const name = document.createElement("div");
-    name.className = "theme-name";
-    name.textContent = themeName;
-  
-    // Dropdown export type
-    const exportSelect = document.createElement("select");
-    exportSelect.className = "export-select";
-    exportSelect.innerHTML = `
-      <option value="svg">SVG</option>
-      <option value="png">PNG</option>
-      <option value="json">JSON</option>
-    `;
-  
-    // Download button
-    const downloadBtn = document.createElement("button");
-    downloadBtn.className = "download-btn";
-    downloadBtn.type = "button";
-    downloadBtn.title = "Download";
-    downloadBtn.innerHTML = getDownloadOcticonSVG();
-  
-    // Copy SVG button
-    const copyBtn = document.createElement("button");
-    copyBtn.className = "copy-btn";
-    copyBtn.type = "button";
-    copyBtn.title = "Copy SVG";
-    copyBtn.innerHTML = getCopyOcticonSVG();
-  
-    downloadBtn.addEventListener("click", async () => {
-      try {
-        const safeTheme = themeName.replace(/[^a-z0-9_-]/gi, "_");
-        const format = exportSelect.value;
-    
-        if (format === "svg") {
-          downloadSVG(svgText, `${username}_${year}_${safeTheme}.svg`);
-          showToast("⬇️ Downloaded SVG");
-        } else if (format === "png") {
-          const blob = await svgWrapToPngBlob(svgWrap, "#0d1117", 2);
-downloadBlob(blob, `${username}_${year}_${safeTheme}.png`);
-showToast("⬇️ Downloaded PNG");
-
-        } else if (format === "json") {
-          const jsonObj = svgToJSON(svgWrap);
-          downloadJSON(jsonObj, `${username}_${year}_${safeTheme}.json`);
-          showToast("⬇️ Downloaded JSON");
-        }
-      } catch (err) {
-        console.error(err);
-        showToast("❌ Download failed");
-      }
-    });
-    copyBtn.addEventListener("click", async () => {
-      try {
-        const blob = await svgWrapToPngBlob(svgWrap, "#0d1117", 2);
-        await copyPngBlobToClipboard(blob);
-        showToast("✅ Copied as image (PNG)");
-      } catch (err) {
-        console.error(err);
-        showToast("❌ Copy image failed");
-      }
-    });
-    
-    
-    
-    
-    const controls = document.createElement("div");
-    controls.className = "theme-controls";
-    
-    controls.appendChild(exportSelect);
-    controls.appendChild(downloadBtn);
-    controls.appendChild(copyBtn);
-    
-    nameRow.appendChild(name);
-    nameRow.appendChild(controls);
-    
-  
-    card.appendChild(svgWrap);
-    card.appendChild(nameRow);
-  
-    grid.appendChild(card);
-  }
-  
-  
-
-  function renderErrorCard(grid, themeName, error) {
-    const card = document.createElement("div");
-    card.className = "theme-card error-card";
-
-    const msg = document.createElement("div");
-    msg.className = "error-msg";
-    msg.textContent = `Failed: ${themeName} — ${error.message}`;
-
-    card.appendChild(msg);
-    grid.appendChild(card);
   }
 
-  // ---------------------------
-  // MAIN FLOW
-  // ---------------------------
-  try {
-    const yearsRes = await fetch(YEARS_URL);
-    if (!yearsRes.ok) throw new Error(`GET years failed (${yearsRes.status})`);
+  async function generateAll(username) {
+    svgCache = {};
+    themeSelect.disabled = true;
+    yearSelect.disabled = true;
 
-    const yearsData = await yearsRes.json();
-    const years = yearsData.years_in_git || [];
+    setPlaceholder("Loading years...");
+    setStatus("");
 
+    const years = await fetchYears(username);
     if (!years.length) {
-      container.textContent = "No years found.";
+      setPlaceholder("No years found for this user.");
       return;
     }
 
-    // For each year create a section and render themes
-    for (const year of years) {
-      const grid = createYearSection(year);
+    const themeNames = Object.keys(themes);
 
-      // Fetch each theme graph
-      for (const [themeName, themeObj] of Object.entries(themes)) {
+    fillSelect(themeSelect, themeNames);
+    fillSelect(yearSelect, years);
+
+    themeSelect.disabled = false;
+    yearSelect.disabled = false;
+
+    const total = years.length * themeNames.length;
+    let done = 0;
+
+    setStatus(`Generating ${total} graphs...`);
+    setPlaceholder("Generating graphs...");
+
+    for (const year of years) {
+      svgCache[year] = {};
+      for (const themeName of themeNames) {
+        const palette = getPalette(themes[themeName]);
         try {
-          const palette = getPalette(themeObj);
-          const svgText = await fetchSVG(year, palette, themeName);
-          renderCard(grid, year, themeName, svgText);
+          const svgText = await fetchSVGFor(username, year, palette);
+          svgCache[year][themeName] = svgText;
         } catch (err) {
-          renderErrorCard(grid, themeName, err);
+          svgCache[year][themeName] =
+            `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="80">
+              <text x="10" y="45" fill="#ff7b72" font-family="system-ui" font-size="14">
+                Failed to load: ${themeName} ${year}
+              </text>
+            </svg>`;
         }
+
+        done += 1;
+        setStatus(`Generating ${total} graphs... (${done}/${total})`);
       }
     }
-  } catch (err) {
-    container.textContent = `Error: ${err.message}`;
+
+    setStatus(`Done. Loaded ${done}/${total} graphs for @${username}.`);
+
+    // default selection
+    themeSelect.value = themeNames[0] || "";
+    yearSelect.value = String(years[0] || "");
+    renderSelected();
   }
+
+  themeSelect.addEventListener("change", renderSelected);
+  yearSelect.addEventListener("change", renderSelected);
+
+  async function onGenerate() {
+    const username = (usernameInput.value || "").trim();
+    if (!username) {
+      setStatus("Please enter a username.");
+      setPlaceholder("Enter a username to generate graphs.");
+      return;
+    }
+
+    try {
+      await generateAll(username);
+    } catch (err) {
+      console.error(err);
+      setStatus(`Error: ${err.message}`);
+      setPlaceholder("Could not generate graphs.");
+    }
+  }
+
+  loadBtn.addEventListener("click", onGenerate);
+  usernameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") onGenerate();
+  });
 })();

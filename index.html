@@ -1,26 +1,79 @@
 <!doctype html>
 <html>
-  <head>
-    <title>GitHub Contributions Graphs</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="index.css" />
-    
-    <script src="themes.js"></script>
-  </head>
-  <div id="toast"></div>
+    <head>
+        <title>GitHub Contributions Graphs</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="index.css" />
+        <script src="themes.js"></script>
+    </head>
 
-  <body>
-    <h1>GitHub Contributions Graphs</h1>
+    <body>
+        <!-- Toast + Tooltip overlays -->
+        <div id="toast"></div>
+        <div id="tooltip"></div>
 
-    <!-- Tooltip -->
-    <div id="tooltip"></div>
+        <div class="app">
+            <!-- LEFT: Graph display -->
+            <main class="left-pane">
+                <div class="left-center">
+                    <div class="graph-and-controls">
+                        <div id="graphDisplay" class="graph-display">
+                            <div class="placeholder">
+                                Enter a username to generate graphs.
+                            </div>
+                        </div>
 
-    <!-- Graphs will be injected here -->
-    <div id="graphs"></div>
-    <script src="https://unpkg.com/@primer/octicons@latest/dist/index.umd.js" defer></script>
+                        <div class="graph-controls">
+                            <label class="control-label" for="themeSelect"
+                                >Theme</label
+                            >
+                            <select
+                                id="themeSelect"
+                                class="select"
+                                disabled
+                            ></select>
 
-    <!-- Main logic -->
-    <script src="index.js" defer></script>
-  </body>
+                            <label class="control-label" for="yearSelect"
+                                >Year</label
+                            >
+                            <select
+                                id="yearSelect"
+                                class="select"
+                                disabled
+                            ></select>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- RIGHT: Header + username input -->
+            <aside class="right-pane">
+                <h1 class="side-title">GitHub Contributions Graphs</h1>
+                <p class="side-subtitle">
+                    Generate contribution graphs for all themes and years, then
+                    browse them.
+                </p>
+
+                <label class="control-label" for="usernameInput"
+                    >Username</label
+                >
+                <div class="username-row">
+                    <input
+                        id="usernameInput"
+                        class="input"
+                        placeholder="e.g. octocat"
+                        autocomplete="off"
+                    />
+                    <button id="loadBtn" class="btn" type="button">
+                        Generate
+                    </button>
+                </div>
+
+                <div id="status" class="status" aria-live="polite"></div>
+            </aside>
+        </div>
+
+        <script src="index.js" defer></script>
+    </body>
 </html>

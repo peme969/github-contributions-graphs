@@ -81,18 +81,20 @@ h1 {
 /* Hover highlight effect */
 svg .day-cell {
     cursor: pointer;
-    transition: filter 0.08s ease, stroke 0.08s ease;
+    transition:
+        filter 0.08s ease,
+        stroke 0.08s ease;
     vector-effect: non-scaling-stroke; /* stroke width stays stable when zooming */
-  }
-  
-  svg .day-cell:hover {
-    filter: brightness(1.35) drop-shadow(0px 0px 3px rgba(255,255,255,0.25));
+}
+
+svg .day-cell:hover {
+    filter: brightness(1.35) drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.25));
     stroke: #ffffff;
     stroke-width: 1;
-  }
-  
-  /* Tooltip box (HTML overlay) */
-  #tooltip {
+}
+
+/* Tooltip box (HTML overlay) */
+#tooltip {
     position: absolute;
     background: #161b22;
     border: 1px solid #30363d;
@@ -100,109 +102,119 @@ svg .day-cell {
     padding: 6px 10px;
     border-radius: 8px;
     font-size: 12px;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.08s ease;
     white-space: nowrap;
     z-index: 9999;
-  }
-  svg {
+}
+svg {
     overflow: visible;
-  }
-  .svg-wrap svg {
+}
+.svg-wrap svg {
     width: 100%;
     height: auto;
     display: block;
-  }
-  body {
+}
+body {
     background: #0d1117;
     color: #c9d1d9;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
     margin: 0;
     padding: 20px;
-  }
-  
-  h1 {
+}
+
+h1 {
     text-align: center;
     margin-bottom: 30px;
-  }
-  
-  /* Main container: vertical layout */
-  #graphs {
+}
+
+/* Main container: vertical layout */
+#graphs {
     display: flex;
     flex-direction: column;
     gap: 40px;
-  }
-  
-  /* Each year block stacked vertically */
-  .year-section {
+}
+
+/* Each year block stacked vertically */
+.year-section {
     display: flex;
     flex-direction: column;
     gap: 20px;
-  }
-  
-  /* Year title styling */
-  .year-section h2 {
+}
+
+/* Year title styling */
+.year-section h2 {
     margin: 0;
     font-size: 22px;
     color: #e6edf3;
-  }
-  
-  /* Graphs inside each year: vertical stacking */
-  .grid {
+}
+
+/* Graphs inside each year: vertical stacking */
+.grid {
     display: flex;
     flex-direction: column;
     gap: 18px;
-  }
-  
-  /* Each theme card */
-  .theme-card {
+}
+
+/* Each theme card */
+.theme-card {
     background: #161b22;
     border: 1px solid #30363d;
     padding: 12px;
     border-radius: 12px;
     overflow: visible;
-  }
-  
-  /* SVG wrapper ensures no zoom/crop */
-  .svg-wrap {
+}
+
+/* SVG wrapper ensures no zoom/crop */
+.svg-wrap {
     width: 100%;
     overflow: visible;
-  }
-  
-  /* ✅ Make SVG responsive */
-  .svg-wrap svg {
+}
+
+/* ✅ Make SVG responsive */
+.svg-wrap svg {
     width: 100%;
     height: auto;
     display: block;
-  }
-  
-  /* Theme name below */
-  .theme-name {
+}
+
+/* Theme name below */
+.theme-name {
     margin-top: 10px;
     font-size: 14px;
     color: #8b949e;
     text-align: center;
-  }
-  .theme-card {
+}
+.theme-card {
     max-width: 900px;
     margin: 0 auto;
-  }
-  .grid {
+}
+.grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
     gap: 18px;
-  }
-  .theme-name-row {
+}
+.theme-name-row {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     margin-top: 10px;
-  }
-  
-  .download-btn {
+}
+
+.download-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -213,29 +225,29 @@ svg .day-cell {
     background: #0d1117;
     cursor: pointer;
     transition: background 0.12s ease;
-  }
-  
-  .download-btn:hover {
+}
+
+.download-btn:hover {
     background: #161b22;
-  }
-  
-  .download-btn svg {
+}
+
+.download-btn svg {
     width: 16px;
     height: 16px;
     fill: #8b949e;
-  }
-  
-  .download-btn:hover svg {
+}
+
+.download-btn:hover svg {
     fill: #e6edf3;
-  }
-  .download-btn svg {
+}
+.download-btn svg {
     fill: #8b949e;
-  }
-  
-  .download-btn:hover svg {
+}
+
+.download-btn:hover svg {
     fill: #e6edf3;
-  }
-  .export-select {
+}
+.export-select {
     background: #0d1117;
     border: 1px solid #30363d;
     color: #c9d1d9;
@@ -244,13 +256,13 @@ svg .day-cell {
     font-size: 13px;
     outline: none;
     cursor: pointer;
-  }
-  
-  .export-select:hover {
+}
+
+.export-select:hover {
     background: #161b22;
-  }
-  
-  .copy-btn {
+}
+
+.copy-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -261,47 +273,47 @@ svg .day-cell {
     background: #0d1117;
     cursor: pointer;
     transition: background 0.12s ease;
-  }
-  
-  .copy-btn:hover {
+}
+
+.copy-btn:hover {
     background: #161b22;
-  }
-  
-  .copy-btn svg {
+}
+
+.copy-btn svg {
     width: 16px;
     height: 16px;
     fill: #8b949e;
-  }
-  
-  .copy-btn:hover svg {
+}
+
+.copy-btn:hover svg {
     fill: #e6edf3;
-  }
-  .theme-name-row {
+}
+.theme-name-row {
     display: flex;
     align-items: center;
     justify-content: space-between; /* ✅ name on left, controls on right */
     gap: 12px;
     margin-top: 10px;
     flex-wrap: wrap;
-  }
-  
-  /* Left side theme title */
-  .theme-name {
+}
+
+/* Left side theme title */
+.theme-name {
     font-size: 15px;
     font-weight: 600;
     color: #c9d1d9;
     line-height: 1;
     padding: 4px 0;
     min-width: 120px; /* keeps it stable */
-  }
-  
-  /* Right-side controls grouped neatly */
-  .theme-controls {
+}
+
+/* Right-side controls grouped neatly */
+.theme-controls {
     display: flex;
     align-items: center;
     gap: 8px;
-  }
-  #toast {
+}
+#toast {
     position: fixed;
     bottom: 18px;
     left: 50%;
@@ -314,23 +326,187 @@ svg .day-cell {
     font-size: 13px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.18s ease, transform 0.18s ease;
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease;
     z-index: 999999;
-  }
-  
-  #toast.show {
+}
+
+#toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(-6px);
-  }
-  .export-select {
+}
+.export-select {
     height: 28px;
     padding: 0 10px;
     line-height: 28px;
-  }
-  .theme-card {
+}
+.theme-card {
     overflow: visible; /* ✅ important */
-  }
-  .svg-wrap {
+}
+.svg-wrap {
     overflow: visible; /* ✅ important */
-  }
-    
+}
+body {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    margin: 0;
+}
+
+/* App layout (LEFT graph, RIGHT controls) */
+.app {
+    min-height: 100vh;
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.left-pane {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+}
+
+.left-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.right-pane {
+    width: 340px;
+    max-width: 40vw;
+    background: #11151d;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.side-title {
+    font-size: 20px;
+    line-height: 1.2;
+    color: #e6edf3;
+}
+
+.side-subtitle {
+    margin: 0;
+    font-size: 13px;
+    color: #8b949e;
+}
+
+.control-label {
+    font-size: 12px;
+    color: #8b949e;
+}
+
+.username-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.input {
+    flex: 1;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+    color: #c9d1d9;
+    padding: 0 10px;
+    outline: none;
+}
+
+.input:focus {
+    border-color: #58a6ff;
+}
+
+.btn {
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    background: #161b22;
+    color: #e6edf3;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: #1f2630;
+}
+
+.status {
+    min-height: 16px;
+    font-size: 12px;
+    color: #8b949e;
+}
+
+.graph-and-controls {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 980px);
+}
+
+.graph-display {
+    flex: 1;
+    min-width: 0;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    padding: 12px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder {
+    color: #8b949e;
+    font-size: 13px;
+    padding: 18px;
+    text-align: center;
+}
+
+.graph-controls {
+    width: 170px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.select {
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+    color: #c9d1d9;
+    padding: 0 10px;
+    outline: none;
+    cursor: pointer;
+}
+
+.select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Keep your existing tooltip styles if you already have them */
