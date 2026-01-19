@@ -50,12 +50,39 @@
     <option value="json">JSON</option>
   </select>
 
-  <button id="exportDownloadBtn" class="btn btn-small" type="button" disabled>
-    Download
-  </button>
-  <button id="exportCopyBtn" class="btn btn-small" type="button" disabled>
-    Copy
-  </button>
+  <button
+  id="exportDownloadBtn"
+  class="btn btn-icon"
+  type="button"
+  disabled
+  title="Download"
+  aria-label="Download"
+>
+  <!-- Download icon -->
+  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M8 1a.75.75 0 0 1 .75.75V8.5l2.22-2.22a.75.75 0 1 1 1.06 1.06L8.53 10.84a.75.75 0 0 1-1.06 0L4 7.34a.75.75 0 1 1 1.06-1.06L7.25 8.5V1.75A.75.75 0 0 1 8 1zM3.5 14a1.5 1.5 0 0 1-1.5-1.5v-1a.75.75 0 0 1 1.5 0v1a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-1a.75.75 0 0 1 1.5 0v1a1.5 1.5 0 0 1-1.5 1.5h-9z"
+    />
+  </svg>
+</button>
+
+<button
+  id="exportCopyBtn"
+  class="btn btn-icon"
+  type="button"
+  disabled
+  title="Copy"
+  aria-label="Copy"
+>
+  <!-- Copy icon -->
+  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M10 1.75A1.75 1.75 0 0 1 11.75 3.5v7A1.75 1.75 0 0 1 10 12.25h-5A1.75 1.75 0 0 1 3.25 10.5v-7A1.75 1.75 0 0 1 5 1.75h5zm0 1.5h-5a.25.25 0 0 0-.25.25v7c0 .14.11.25.25.25h5a.25.25 0 0 0 .25-.25v-7a.25.25 0 0 0-.25-.25zM2 4.75a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5a.25.25 0 0 0-.25.25v7c0 .14.11.25.25.25h5a.75.75 0 0 1 0 1.5h-5A1.75 1.75 0 0 1 1 12.75v-7z"
+    />
+  </svg>
+</button>
 </div>
                         </div>
                     </div>
