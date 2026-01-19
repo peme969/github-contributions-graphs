@@ -768,3 +768,9 @@ body {
     font-size: 12px;
     color: #8b949e;
 }
+.export-actions {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+}
