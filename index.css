@@ -925,3 +925,13 @@ body {
     animation: none !important;
   }
 }
+.svg-wrap svg {
+  height: auto;
+  max-width: 100%;
+}
+@media (min-width: 901px) {
+  .right-pane {
+    position: sticky;
+    top: var(--gap);
+  }
+}
