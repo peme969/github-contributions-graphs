@@ -256,27 +256,92 @@ function downloadJSON(jsonObj, filename) {
 async function copySVGToClipboard(svgText) {
   await navigator.clipboard.writeText(svgText);
 }
-
 (async function () {
-  // UI elements
+  // --- UI elements ---
   const usernameInput = document.getElementById("usernameInput");
   const loadBtn = document.getElementById("loadBtn");
+  const btnText = document.getElementById("btnText");
+  const btnSpinner = document.getElementById("btnSpinner");
+
   const themeSelect = document.getElementById("themeSelect");
   const yearSelect = document.getElementById("yearSelect");
   const graphDisplay = document.getElementById("graphDisplay");
+  const graphSpinner = document.getElementById("graphSpinner");
+
   const statusEl = document.getElementById("status");
   const tooltip = document.getElementById("tooltip");
 
-  // Cache: { [year]: { [themeName]: svgText } }
+  const progressFill = document.getElementById("progressFill");
+  const progressText = document.getElementById("progressText");
+  const progressDetail = document.getElementById("progressDetail");
+
+  const exportSelect = document.getElementById("exportSelect");
+
+  // Cache: svgCache[year][themeName] = svgText
   let svgCache = {};
+  let loadedYears = new Set();
+  let currentUsername = "";
 
   function setStatus(text) {
-    if (!statusEl) return;
-    statusEl.textContent = text || "";
+    if (statusEl) statusEl.textContent = text || "";
   }
 
   function setPlaceholder(text) {
-    graphDisplay.innerHTML = `<div class="placeholder">${text}</div>`;
+    graphDisplay.innerHTML = `<div id="graphSpinner" class="spinner-overlay hidden" aria-hidden="true">
+        <div class="spinner"></div>
+        <div class="spinner-text">Loading…</div>
+      </div>
+      <div class="placeholder">${text}</div>`;
+  }
+
+  function setGraphSpinner(on, text = "Loading…") {
+    const spinner = document.getElementById("graphSpinner");
+    if (!spinner) return;
+    spinner.classList.toggle("hidden", !on);
+    const t = spinner.querySelector(".spinner-text");
+    if (t) t.textContent = text;
+  }
+
+  function setButtonBusy(on) {
+    if (!loadBtn) return;
+    loadBtn.disabled = on;
+    if (btnText) btnText.textContent = on ? "Generating" : "Generate";
+    if (btnSpinner) btnSpinner.classList.toggle("hidden", !on);
+  }
+
+  function setProgress(pct, headline, detail) {
+    const clamped = Math.max(0, Math.min(100, pct));
+    if (progressFill) progressFill.style.width = `${clamped}%`;
+    if (progressText) progressText.textContent = headline || "—";
+    if (progressDetail) progressDetail.textContent = detail || "";
+  }
+
+  function fillSelect(selectEl, values, { disabledAll = false } = {}) {
+    selectEl.innerHTML = "";
+    for (const v of values) {
+      const opt = document.createElement("option");
+      opt.value = String(v);
+      opt.textContent = String(v);
+      if (disabledAll) opt.disabled = true;
+      selectEl.appendChild(opt);
+    }
+  }
+
+  function markYearOption(year, { loaded }) {
+    const opts = [...yearSelect.options];
+    const opt = opts.find((o) => o.value === String(year));
+    if (!opt) return;
+    opt.disabled = !loaded;
+    opt.textContent = loaded ? String(year) : `${year} (loading…)`;
+  }
+
+  function disableExports() {
+    exportSelect.disabled = true;
+    exportSelect.value = "";
+  }
+  function enableExports() {
+    exportSelect.disabled = false;
+    exportSelect.value = "";
   }
 
   function bindTooltips(scopeEl) {
@@ -321,16 +386,16 @@ async function copySVGToClipboard(svgText) {
 
   async function fetchYears(username) {
     const YEARS_URL = `https://github-contribution-graph-generator.vercel.app/graph/years/${username}`;
-    const yearsRes = await fetch(YEARS_URL);
-    if (!yearsRes.ok) throw new Error(`GET years failed (${yearsRes.status})`);
-    const yearsData = await yearsRes.json();
-    return yearsData.years_in_git || [];
+    const res = await fetch(YEARS_URL);
+    if (!res.ok) throw new Error(`GET years failed (${res.status})`);
+    const data = await res.json();
+    return data.years_in_git || [];
   }
 
   async function fetchSVGFor(username, year, palette) {
     const POST_URL = `https://github-contribution-graph-generator.vercel.app/custom/${username}`;
     const payload = { palette };
-    const res = await fetch(POST_URL + "?year=" + year, {
+    const res = await fetch(`${POST_URL}?year=${year}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -339,68 +404,159 @@ async function copySVGToClipboard(svgText) {
     return await res.text();
   }
 
-  function fillSelect(selectEl, options) {
-    selectEl.innerHTML = "";
-    for (const v of options) {
-      const opt = document.createElement("option");
-      opt.value = String(v);
-      opt.textContent = String(v);
-      selectEl.appendChild(opt);
-    }
-  }
-
   function renderSelected() {
-    const themeName = themeSelect.value;
     const year = yearSelect.value;
-    if (!themeName || !year) return;
+    const themeName = themeSelect.value;
 
-    const svgText = svgCache?.[year]?.[themeName];
-    if (!svgText) {
-      setPlaceholder("Graph not loaded yet.");
+    if (!year || !themeName) {
+      disableExports();
+      setPlaceholder("Select a year and theme.");
       return;
     }
 
-    const svgWrap = document.createElement("div");
-    svgWrap.className = "svg-wrap";
-    svgWrap.innerHTML = svgText;
+    if (!loadedYears.has(String(year))) {
+      disableExports();
+      setPlaceholder(`Year ${year} is still loading…`);
+      return;
+    }
 
-    graphDisplay.innerHTML = "";
-    graphDisplay.appendChild(svgWrap);
-    bindTooltips(svgWrap);
+    const svgText = svgCache?.[year]?.[themeName];
+    if (!svgText) {
+      disableExports();
+      setPlaceholder("That graph isn’t ready yet.");
+      return;
+    }
+
+    const wrap = document.createElement("div");
+    wrap.className = "svg-wrap";
+    wrap.innerHTML = svgText;
+
+    graphDisplay.innerHTML = `
+      <div id="graphSpinner" class="spinner-overlay hidden" aria-hidden="true">
+        <div class="spinner"></div>
+        <div class="spinner-text">Loading…</div>
+      </div>
+    `;
+    graphDisplay.appendChild(wrap);
+
+    bindTooltips(wrap);
+    enableExports();
   }
 
+  function currentSvgText() {
+    const year = yearSelect.value;
+    const themeName = themeSelect.value;
+    return svgCache?.[year]?.[themeName] || "";
+  }
+
+  exportSelect.addEventListener("change", async () => {
+    const format = exportSelect.value;
+    if (!format) return;
+
+    // reset back to placeholder option after action
+    exportSelect.value = "";
+
+    const year = yearSelect.value;
+    const themeNameSafe = themeSelect.value.replace(/[^a-z0-9_-]/gi, "_");
+
+    if (!loadedYears.has(String(year))) return;
+
+    if (format === "svg") {
+      const svgText = currentSvgText();
+      if (!svgText) return;
+
+      downloadBlob(
+        new Blob([svgText], { type: "image/svg+xml;charset=utf-8" }),
+        `${currentUsername}_${year}_${themeNameSafe}.svg`,
+      );
+      return;
+    }
+
+    if (format === "png") {
+      const svgWrap = graphDisplay.querySelector(".svg-wrap");
+      if (!svgWrap) return;
+
+      setGraphSpinner(true, "Exporting PNG…");
+      try {
+        const blob = await svgWrapToPngBlob(svgWrap, "#0d1117", 2);
+        downloadBlob(blob, `${currentUsername}_${year}_${themeNameSafe}.png`);
+      } finally {
+        setGraphSpinner(false);
+      }
+      return;
+    }
+
+    if (format === "json") {
+      const svgWrap = graphDisplay.querySelector(".svg-wrap");
+      if (!svgWrap) return;
+
+      const jsonObj = svgToJSON(svgWrap);
+      downloadJSON(jsonObj, `${currentUsername}_${year}_${themeNameSafe}.json`);
+      return;
+    }
+  });
+
+  themeSelect.addEventListener("change", renderSelected);
+  yearSelect.addEventListener("change", renderSelected);
+
   async function generateAll(username) {
+    currentUsername = username;
     svgCache = {};
+    loadedYears = new Set();
+
+    disableExports();
     themeSelect.disabled = true;
     yearSelect.disabled = true;
 
-    setPlaceholder("Loading years...");
-    setStatus("");
+    setPlaceholder("Loading years…");
+    setProgress(0, "Loading years…", "");
 
     const years = await fetchYears(username);
     if (!years.length) {
       setPlaceholder("No years found for this user.");
+      setProgress(0, "—", "");
       return;
     }
 
+    // Fill theme dropdown immediately (themes are known locally)
     const themeNames = Object.keys(themes);
-
     fillSelect(themeSelect, themeNames);
-    fillSelect(yearSelect, years);
-
     themeSelect.disabled = false;
+
+    // Fill years dropdown but DISABLE all options until loaded
+    fillSelect(yearSelect, years, { disabledAll: true });
+
+    // Pick a “preview” selection (first theme). Year will get selected once it loads.
+    themeSelect.value = themeNames[0] || "";
+    yearSelect.value = String(years[0]);
+
+    // We keep yearSelect enabled so user can see the list, but locked options cannot be clicked
     yearSelect.disabled = false;
 
-    const total = years.length * themeNames.length;
-    let done = 0;
+    const totalYears = years.length;
+    const totalThemes = themeNames.length;
 
-    setStatus(`Generating ${total} graphs...`);
-    setPlaceholder("Generating graphs...");
-
-    for (const year of years) {
+    // Year-by-year generation
+    for (let yi = 0; yi < years.length; yi++) {
+      const year = String(years[yi]);
       svgCache[year] = {};
-      for (const themeName of themeNames) {
+      markYearOption(year, { loaded: false });
+
+      // Show spinner while generating this year (first year especially)
+      setGraphSpinner(true, `Loading year ${year}…`);
+
+      for (let ti = 0; ti < themeNames.length; ti++) {
+        const themeName = themeNames[ti];
         const palette = getPalette(themes[themeName]);
+
+        // Update progress (overall + per-year detail)
+        const overallPct = (yi / totalYears) * 100;
+        setProgress(
+          overallPct,
+          `Year ${yi + 1}/${totalYears}`,
+          `Loading ${year}: theme ${ti + 1}/${totalThemes}`,
+        );
+
         try {
           const svgText = await fetchSVGFor(username, year, palette);
           svgCache[year][themeName] = svgText;
@@ -413,21 +569,33 @@ async function copySVGToClipboard(svgText) {
             </svg>`;
         }
 
-        done += 1;
-        setStatus(`Generating ${total} graphs... (${done}/${total})`);
+        // If the user is currently looking at this year/theme, refresh the view
+        if (yearSelect.value === year && themeSelect.value === themeName) {
+          renderSelected();
+        }
       }
+
+      // Mark year as loaded (unlock option)
+      loadedYears.add(year);
+      markYearOption(year, { loaded: true });
+
+      // If this is the first loaded year, render it immediately
+      if (loadedYears.size === 1) {
+        yearSelect.value = year;
+        renderSelected();
+      }
+
+      setGraphSpinner(false);
+      const finishedPct = ((yi + 1) / totalYears) * 100;
+      setProgress(
+        finishedPct,
+        `Loaded ${yi + 1}/${totalYears} years`,
+        `Finished year ${year}`,
+      );
     }
 
-    setStatus(`Done. Loaded ${done}/${total} graphs for @${username}.`);
-
-    // default selection
-    themeSelect.value = themeNames[0] || "";
-    yearSelect.value = String(years[0] || "");
-    renderSelected();
+    setStatus(`Done. Loaded ${loadedYears.size} years for @${username}.`);
   }
-
-  themeSelect.addEventListener("change", renderSelected);
-  yearSelect.addEventListener("change", renderSelected);
 
   async function onGenerate() {
     const username = (usernameInput.value || "").trim();
@@ -437,12 +605,19 @@ async function copySVGToClipboard(svgText) {
       return;
     }
 
+    setStatus("");
+    setButtonBusy(true);
     try {
       await generateAll(username);
     } catch (err) {
       console.error(err);
       setStatus(`Error: ${err.message}`);
       setPlaceholder("Could not generate graphs.");
+      setProgress(0, "—", "");
+      disableExports();
+    } finally {
+      setButtonBusy(false);
+      setGraphSpinner(false);
     }
   }
 

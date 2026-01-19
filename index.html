@@ -9,16 +9,23 @@
     </head>
 
     <body>
-        <!-- Toast + Tooltip overlays -->
         <div id="toast"></div>
         <div id="tooltip"></div>
 
         <div class="app">
-            <!-- LEFT: Graph display -->
+            <!-- LEFT: Graph + dropdowns + export -->
             <main class="left-pane">
                 <div class="left-center">
                     <div class="graph-and-controls">
                         <div id="graphDisplay" class="graph-display">
+                            <div
+                                id="graphSpinner"
+                                class="spinner-overlay hidden"
+                                aria-hidden="true"
+                            >
+                                <div class="spinner"></div>
+                                <div class="spinner-text">Loading…</div>
+                            </div>
                             <div class="placeholder">
                                 Enter a username to generate graphs.
                             </div>
@@ -42,17 +49,29 @@
                                 class="select"
                                 disabled
                             ></select>
+
+                            <label class="control-label" for="exportSelect"
+                                >Export</label
+                            >
+                            <select id="exportSelect" class="select" disabled>
+                                <option value="" selected>
+                                    Choose format…
+                                </option>
+                                <option value="svg">SVG</option>
+                                <option value="png">PNG</option>
+                                <option value="json">JSON</option>
+                            </select>
                         </div>
                     </div>
                 </div>
             </main>
 
-            <!-- RIGHT: Header + username input -->
+            <!-- RIGHT: Header + username + progress -->
             <aside class="right-pane">
                 <h1 class="side-title">GitHub Contributions Graphs</h1>
                 <p class="side-subtitle">
-                    Generate contribution graphs for all themes and years, then
-                    browse them.
+                    Generates graphs year-by-year. Years stay locked until fully
+                    loaded.
                 </p>
 
                 <label class="control-label" for="usernameInput"
@@ -66,8 +85,28 @@
                         autocomplete="off"
                     />
                     <button id="loadBtn" class="btn" type="button">
-                        Generate
+                        <span id="btnText">Generate</span>
+                        <span
+                            id="btnSpinner"
+                            class="btn-spinner hidden"
+                            aria-hidden="true"
+                        ></span>
                     </button>
+                </div>
+
+                <div class="progress-wrap">
+                    <div class="progress-top">
+                        <div class="progress-label">Progress</div>
+                        <div id="progressText" class="progress-text">—</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div
+                            id="progressFill"
+                            class="progress-fill"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                    <div id="progressDetail" class="progress-detail"></div>
                 </div>
 
                 <div id="status" class="status" aria-live="polite"></div>

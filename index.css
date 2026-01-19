@@ -510,3 +510,261 @@ h1 {
 }
 
 /* Keep your existing tooltip styles if you already have them */
+/* ---- New 2-pane app layout overrides ---- */
+body {
+    margin: 0;
+    padding: 20px;
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+.app {
+    min-height: calc(100vh - 40px);
+    display: flex;
+    gap: 16px;
+}
+
+.left-pane {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+}
+
+.left-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.right-pane {
+    width: 360px;
+    max-width: 42vw;
+    background: #11151d;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.side-title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.2;
+    color: #e6edf3;
+}
+
+.side-subtitle {
+    margin: 0;
+    font-size: 13px;
+    color: #8b949e;
+}
+
+.control-label {
+    font-size: 12px;
+    color: #8b949e;
+}
+
+.username-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.input {
+    flex: 1;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+    color: #c9d1d9;
+    padding: 0 10px;
+    outline: none;
+}
+.input:focus {
+    border-color: #58a6ff;
+}
+
+.btn {
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    background: #161b22;
+    color: #e6edf3;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn:hover {
+    background: #1f2630;
+}
+
+.btn-small {
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 10px;
+}
+
+.status {
+    min-height: 16px;
+    font-size: 12px;
+    color: #8b949e;
+}
+
+.graph-and-controls {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 980px);
+}
+
+.graph-display {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    padding: 12px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder {
+    color: #8b949e;
+    font-size: 13px;
+    padding: 18px;
+    text-align: center;
+}
+
+.graph-controls {
+    width: 190px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.select {
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+    color: #c9d1d9;
+    padding: 0 10px;
+    outline: none;
+    cursor: pointer;
+}
+.select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.svg-wrap {
+    width: 100%;
+    overflow: visible;
+}
+.svg-wrap svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ---- Spinners ---- */
+.spinner-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    background: rgba(13, 17, 23, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    z-index: 10;
+}
+.hidden {
+    display: none !important;
+}
+
+.spinner {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    border: 3px solid #30363d;
+    border-top-color: #58a6ff;
+    animation: spin 0.85s linear infinite;
+}
+.spinner-text {
+    font-size: 12px;
+    color: #c9d1d9;
+}
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.btn-spinner {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    border: 2px solid #30363d;
+    border-top-color: #58a6ff;
+    animation: spin 0.85s linear infinite;
+}
+
+/* ---- Progress ---- */
+.progress-wrap {
+    margin-top: 6px;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+}
+.progress-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+.progress-label {
+    font-size: 12px;
+    color: #8b949e;
+}
+.progress-text {
+    font-size: 12px;
+    color: #c9d1d9;
+}
+.progress-bar {
+    margin-top: 8px;
+    height: 10px;
+    border-radius: 999px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #58a6ff;
+}
+.progress-detail {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #8b949e;
+}
