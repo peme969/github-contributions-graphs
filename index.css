@@ -794,3 +794,134 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
 }
+/* ---------- Mobile-friendly layout ---------- */
+:root {
+  --gap: 16px;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+.app {
+  display: grid;
+  grid-template-columns: 1fr 360px; /* desktop default */
+  gap: var(--gap);
+  align-items: start;
+  padding: var(--gap);
+  min-height: 100dvh;
+}
+
+/* Ensure panes can shrink properly */
+.left-pane,
+.right-pane {
+  min-width: 0;
+}
+
+/* Make the graph area behave on small screens */
+.graph-display {
+  width: 100%;
+  max-width: 100%;
+  overflow: auto;                 /* allows horizontal scroll if SVG is wide */
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+}
+
+/* If SVG is larger than the viewport, allow panning */
+.svg-wrap {
+  min-width: max-content;
+}
+
+/* Controls: wrap instead of squishing */
+.graph-controls {
+  display: grid;
+  grid-template-columns: 1fr;     /* will become 2 columns on wider screens */
+  gap: 10px;
+}
+
+/* Make selects/inputs/buttons easy to tap */
+.select,
+.input,
+.btn {
+  width: 100%;
+  min-height: 44px;               /* comfortable touch target */
+  font-size: 16px;                /* prevents iOS zoom on focus */
+}
+
+/* Export row: keep buttons usable on mobile */
+.export-actions {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn.btn-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+
+/* Username row: stack on very small screens */
+.username-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ---------- Breakpoints ---------- */
+
+/* Tablet and down */
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;   /* stack panes */
+  }
+
+  .right-pane {
+    order: -1;                    /* put controls on top */
+  }
+
+  .graph-controls {
+    grid-template-columns: 1fr 1fr; /* 2 columns for controls when possible */
+    column-gap: 12px;
+  }
+
+  /* Labels align nicely above controls in grid */
+  .control-label {
+    margin-top: 4px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 520px) {
+  .app {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .graph-controls {
+    grid-template-columns: 1fr;   /* single column */
+  }
+
+  .username-row {
+    grid-template-columns: 1fr;   /* stack input + button */
+  }
+
+  #loadBtn {
+    width: 100%;
+  }
+
+  .export-actions {
+    grid-template-columns: 1fr 44px 44px;
+  }
+}
+
+/* Optional: reduce motion preference for spinners/animations */
+@media (prefers-reduced-motion: reduce) {
+  .spinner,
+  .btn-spinner {
+    animation: none !important;
+  }
+}
