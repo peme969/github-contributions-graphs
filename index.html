@@ -41,26 +41,22 @@
                                 disabled
                             ></select>
 
-                            <label class="control-label" for="yearSelect"
-                                >Year</label
-                            >
-                            <select
-                                id="yearSelect"
-                                class="select"
-                                disabled
-                            ></select>
+                            <label class="control-label" for="exportSelect">Export</label>
+<div class="export-actions">
+  <select id="exportSelect" class="select" disabled>
+    <option value="" selected>Select type…</option>
+    <option value="svg">SVG</option>
+    <option value="png">PNG</option>
+    <option value="json">JSON</option>
+  </select>
 
-                            <label class="control-label" for="exportSelect"
-                                >Export</label
-                            >
-                            <select id="exportSelect" class="select" disabled>
-                                <option value="" selected>
-                                    Choose format…
-                                </option>
-                                <option value="svg">SVG</option>
-                                <option value="png">PNG</option>
-                                <option value="json">JSON</option>
-                            </select>
+  <button id="exportDownloadBtn" class="btn btn-small" type="button" disabled>
+    Download
+  </button>
+  <button id="exportCopyBtn" class="btn btn-small" type="button" disabled>
+    Copy
+  </button>
+</div>
                         </div>
                     </div>
                 </div>
