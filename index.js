@@ -276,6 +276,8 @@ async function copySVGToClipboard(svgText) {
   const progressDetail = document.getElementById("progressDetail");
 
   const exportSelect = document.getElementById("exportSelect");
+const exportDownloadBtn = document.getElementById("exportDownloadBtn");
+const exportCopyBtn = document.getElementById("exportCopyBtn");
 
   // Cache: svgCache[year][themeName] = svgText
   let svgCache = {};
@@ -336,13 +338,24 @@ async function copySVGToClipboard(svgText) {
   }
 
   function disableExports() {
-    exportSelect.disabled = true;
-    exportSelect.value = "";
-  }
-  function enableExports() {
-    exportSelect.disabled = false;
-    exportSelect.value = "";
-  }
+  exportSelect.disabled = true;
+  exportSelect.value = "";
+  exportDownloadBtn.disabled = true;
+  exportCopyBtn.disabled = true;
+}
+
+function enableExports() {
+  exportSelect.disabled = false;
+  exportSelect.value = "";
+  exportDownloadBtn.disabled = true; // stays disabled until a type is selected
+  exportCopyBtn.disabled = true;
+}
+
+function updateExportButtons() {
+  const hasType = !!exportSelect.value;
+  exportDownloadBtn.disabled = !hasType;
+  exportCopyBtn.disabled = !hasType;
+}
 
   function bindTooltips(scopeEl) {
     const cells = scopeEl.querySelectorAll(".day-cell");
@@ -441,6 +454,8 @@ async function copySVGToClipboard(svgText) {
 
     bindTooltips(wrap);
     enableExports();
+    
+updateExportButtons(); // keeps buttons disabled until user selects a type
   }
 
   function currentSvgText() {
@@ -449,52 +464,125 @@ async function copySVGToClipboard(svgText) {
     return svgCache?.[year]?.[themeName] || "";
   }
 
-  exportSelect.addEventListener("change", async () => {
-    const format = exportSelect.value;
-    if (!format) return;
+  exportSelect.addEventListener("change", () => {
+  // user must pick a type first; then buttons enable
+  updateExportButtons();
+});
 
-    // reset back to placeholder option after action
-    exportSelect.value = "";
+async function getCurrentPngBlob() {
+  const svgWrap = graphDisplay.querySelector(".svg-wrap");
+  if (!svgWrap) return null;
+  // uses your existing helper
+  return await svgWrapToPngBlob(svgWrap, "#0d1117", 2);
+}
 
-    const year = yearSelect.value;
-    const themeNameSafe = themeSelect.value.replace(/[^a-z0-9_-]/gi, "_");
+function getCurrentJsonObject() {
+  const svgWrap = graphDisplay.querySelector(".svg-wrap");
+  if (!svgWrap) return null;
+  // uses your existing helper
+  return svgToJSON(svgWrap);
+}
 
-    if (!loadedYears.has(String(year))) return;
+function makeSafeName(s) {
+  return String(s || "").replace(/[^a-z0-9_-]/gi, "_");
+}
 
-    if (format === "svg") {
-      const svgText = currentSvgText();
-      if (!svgText) return;
+async function doDownloadSelectedType() {
+  const format = exportSelect.value;
+  if (!format) return;
 
-      downloadBlob(
-        new Blob([svgText], { type: "image/svg+xml;charset=utf-8" }),
-        `${currentUsername}_${year}_${themeNameSafe}.svg`,
-      );
-      return;
+  const year = yearSelect.value;
+  if (!loadedYears.has(String(year))) return;
+
+  const themeNameSafe = makeSafeName(themeSelect.value);
+
+  if (format === "svg") {
+    const svgText = currentSvgText();
+    if (!svgText) return;
+
+    downloadBlob(
+      new Blob([svgText], { type: "image/svg+xml;charset=utf-8" }),
+      `${currentUsername}_${year}_${themeNameSafe}.svg`
+    );
+    return;
+  }
+
+  if (format === "png") {
+    setGraphSpinner(true, "Preparing PNG…");
+    try {
+      const blob = await getCurrentPngBlob();
+      if (!blob) return;
+      downloadBlob(blob, `${currentUsername}_${year}_${themeNameSafe}.png`);
+    } finally {
+      setGraphSpinner(false);
     }
+    return;
+  }
 
-    if (format === "png") {
-      const svgWrap = graphDisplay.querySelector(".svg-wrap");
-      if (!svgWrap) return;
+  if (format === "json") {
+    const obj = getCurrentJsonObject();
+    if (!obj) return;
+    downloadJSON(obj, `${currentUsername}_${year}_${themeNameSafe}.json`);
+    return;
+  }
+}
 
-      setGraphSpinner(true, "Exporting PNG…");
-      try {
-        const blob = await svgWrapToPngBlob(svgWrap, "#0d1117", 2);
-        downloadBlob(blob, `${currentUsername}_${year}_${themeNameSafe}.png`);
-      } finally {
-        setGraphSpinner(false);
+async function doCopySelectedType() {
+  const format = exportSelect.value;
+  if (!format) return;
+
+  const year = yearSelect.value;
+  if (!loadedYears.has(String(year))) return;
+
+  // SVG + JSON -> text copy
+  if (format === "svg") {
+    const svgText = currentSvgText();
+    if (!svgText) return;
+    await navigator.clipboard.writeText(svgText);
+    showToast("Copied SVG to clipboard.");
+    return;
+  }
+
+  if (format === "json") {
+    const obj = getCurrentJsonObject();
+    if (!obj) return;
+    await navigator.clipboard.writeText(JSON.stringify(obj, null, 2));
+    showToast("Copied JSON to clipboard.");
+    return;
+  }
+
+  // PNG -> image copy (may not be supported in all browsers)
+  if (format === "png") {
+    setGraphSpinner(true, "Copying PNG…");
+    try {
+      const blob = await getCurrentPngBlob();
+      if (!blob) return;
+
+      if (!navigator.clipboard || !navigator.clipboard.write) {
+        showToast("Copying images isn’t supported in this browser. Use Download.");
+        return;
       }
-      return;
-    }
 
-    if (format === "json") {
-      const svgWrap = graphDisplay.querySelector(".svg-wrap");
-      if (!svgWrap) return;
-
-      const jsonObj = svgToJSON(svgWrap);
-      downloadJSON(jsonObj, `${currentUsername}_${year}_${themeNameSafe}.json`);
-      return;
+      const item = new ClipboardItem({ [blob.type]: blob });
+      await navigator.clipboard.write([item]);
+      showToast("Copied PNG image to clipboard.");
+    } catch (err) {
+      console.error(err);
+      showToast("Could not copy PNG. Try Download instead.");
+    } finally {
+      setGraphSpinner(false);
     }
-  });
+    return;
+  }
+}
+
+exportDownloadBtn.addEventListener("click", () => {
+  doDownloadSelectedType();
+});
+
+exportCopyBtn.addEventListener("click", () => {
+  doCopySelectedType();
+});
 
   themeSelect.addEventListener("change", renderSelected);
   yearSelect.addEventListener("change", renderSelected);
