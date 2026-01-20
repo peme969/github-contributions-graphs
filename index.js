@@ -276,8 +276,8 @@ async function copySVGToClipboard(svgText) {
   const progressDetail = document.getElementById("progressDetail");
 
   const exportSelect = document.getElementById("exportSelect");
-const exportDownloadBtn = document.getElementById("exportDownloadBtn");
-const exportCopyBtn = document.getElementById("exportCopyBtn");
+  const exportDownloadBtn = document.getElementById("exportDownloadBtn");
+  const exportCopyBtn = document.getElementById("exportCopyBtn");
 
   // Cache: svgCache[year][themeName] = svgText
   let svgCache = {};
@@ -338,24 +338,24 @@ const exportCopyBtn = document.getElementById("exportCopyBtn");
   }
 
   function disableExports() {
-  exportSelect.disabled = true;
-  exportSelect.value = "";
-  exportDownloadBtn.disabled = true;
-  exportCopyBtn.disabled = true;
-}
+    exportSelect.disabled = true;
+    exportSelect.value = "";
+    exportDownloadBtn.disabled = true;
+    exportCopyBtn.disabled = true;
+  }
 
-function enableExports() {
-  exportSelect.disabled = false;
-  exportSelect.value = "";
-  exportDownloadBtn.disabled = true; // stays disabled until a type is selected
-  exportCopyBtn.disabled = true;
-}
+  function enableExports() {
+    exportSelect.disabled = false;
+    exportSelect.value = "";
+    exportDownloadBtn.disabled = true; // stays disabled until a type is selected
+    exportCopyBtn.disabled = true;
+  }
 
-function updateExportButtons() {
-  const hasType = !!exportSelect.value;
-  exportDownloadBtn.disabled = !hasType;
-  exportCopyBtn.disabled = !hasType;
-}
+  function updateExportButtons() {
+    const hasType = !!exportSelect.value;
+    exportDownloadBtn.disabled = !hasType;
+    exportCopyBtn.disabled = !hasType;
+  }
 
   function bindTooltips(scopeEl) {
     const cells = scopeEl.querySelectorAll(".day-cell");
@@ -416,6 +416,48 @@ function updateExportButtons() {
     if (!res.ok) throw new Error(`POST failed (${res.status})`);
     return await res.text();
   }
+  function makeSvgAutoFit(svgEl) {
+    if (!svgEl) return;
+
+    // 1) If viewBox missing, derive it from width/height OR from bbox fallback
+    if (!svgEl.getAttribute("viewBox")) {
+      // width/height might be "900", "900px", or missing
+      let w = parseFloat(svgEl.getAttribute("width") || "");
+      let h = parseFloat(svgEl.getAttribute("height") || "");
+
+      // If width/height missing, try using rendered box
+      if (!w || !h) {
+        // getBBox requires the SVG to be in the DOM; renderSelected already appends it
+        try {
+          const bb = svgEl.getBBox();
+          if (bb && bb.width && bb.height) {
+            w = bb.width;
+            h = bb.height;
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      // Final fallback so we ALWAYS set something
+      if (!w) w = 1200;
+      if (!h) h = 400;
+
+      svgEl.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    }
+
+    // 2) Remove hard sizing so CSS controls it
+    svgEl.removeAttribute("width");
+    svgEl.removeAttribute("height");
+
+    // 3) Prevent distortion, align nicely
+    svgEl.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+    // 4) (Optional but often helpful) make it scale from container bounds
+    svgEl.style.width = "100%";
+    svgEl.style.height = "auto";
+    svgEl.style.display = "block";
+  }
 
   function renderSelected() {
     const year = yearSelect.value;
@@ -452,10 +494,16 @@ function updateExportButtons() {
     `;
     graphDisplay.appendChild(wrap);
 
+    // NOW it is in the DOM, so bbox fallback works
+    makeSvgAutoFit(wrap.querySelector("svg"));
+    const s = wrap.querySelector("svg");
+    console.log("viewBox:", s.getAttribute("viewBox"));
+    console.log("computed width:", getComputedStyle(s).width);
+
     bindTooltips(wrap);
     enableExports();
-    
-updateExportButtons(); // keeps buttons disabled until user selects a type
+
+    updateExportButtons(); // keeps buttons disabled until user selects a type
   }
 
   function currentSvgText() {
@@ -465,124 +513,126 @@ updateExportButtons(); // keeps buttons disabled until user selects a type
   }
 
   exportSelect.addEventListener("change", () => {
-  // user must pick a type first; then buttons enable
-  updateExportButtons();
-});
+    // user must pick a type first; then buttons enable
+    updateExportButtons();
+  });
 
-async function getCurrentPngBlob() {
-  const svgWrap = graphDisplay.querySelector(".svg-wrap");
-  if (!svgWrap) return null;
-  // uses your existing helper
-  return await svgWrapToPngBlob(svgWrap, "#0d1117", 2);
-}
-
-function getCurrentJsonObject() {
-  const svgWrap = graphDisplay.querySelector(".svg-wrap");
-  if (!svgWrap) return null;
-  // uses your existing helper
-  return svgToJSON(svgWrap);
-}
-
-function makeSafeName(s) {
-  return String(s || "").replace(/[^a-z0-9_-]/gi, "_");
-}
-
-async function doDownloadSelectedType() {
-  const format = exportSelect.value;
-  if (!format) return;
-
-  const year = yearSelect.value;
-  if (!loadedYears.has(String(year))) return;
-
-  const themeNameSafe = makeSafeName(themeSelect.value);
-
-  if (format === "svg") {
-    const svgText = currentSvgText();
-    if (!svgText) return;
-
-    downloadBlob(
-      new Blob([svgText], { type: "image/svg+xml;charset=utf-8" }),
-      `${currentUsername}_${year}_${themeNameSafe}.svg`
-    );
-    return;
+  async function getCurrentPngBlob() {
+    const svgWrap = graphDisplay.querySelector(".svg-wrap");
+    if (!svgWrap) return null;
+    // uses your existing helper
+    return await svgWrapToPngBlob(svgWrap, "#0d1117", 2);
   }
 
-  if (format === "png") {
-    setGraphSpinner(true, "Preparing PNG…");
-    try {
-      const blob = await getCurrentPngBlob();
-      if (!blob) return;
-      downloadBlob(blob, `${currentUsername}_${year}_${themeNameSafe}.png`);
-    } finally {
-      setGraphSpinner(false);
+  function getCurrentJsonObject() {
+    const svgWrap = graphDisplay.querySelector(".svg-wrap");
+    if (!svgWrap) return null;
+    // uses your existing helper
+    return svgToJSON(svgWrap);
+  }
+
+  function makeSafeName(s) {
+    return String(s || "").replace(/[^a-z0-9_-]/gi, "_");
+  }
+
+  async function doDownloadSelectedType() {
+    const format = exportSelect.value;
+    if (!format) return;
+
+    const year = yearSelect.value;
+    if (!loadedYears.has(String(year))) return;
+
+    const themeNameSafe = makeSafeName(themeSelect.value);
+
+    if (format === "svg") {
+      const svgText = currentSvgText();
+      if (!svgText) return;
+
+      downloadBlob(
+        new Blob([svgText], { type: "image/svg+xml;charset=utf-8" }),
+        `${currentUsername}_${year}_${themeNameSafe}.svg`,
+      );
+      return;
     }
-    return;
-  }
 
-  if (format === "json") {
-    const obj = getCurrentJsonObject();
-    if (!obj) return;
-    downloadJSON(obj, `${currentUsername}_${year}_${themeNameSafe}.json`);
-    return;
-  }
-}
-
-async function doCopySelectedType() {
-  const format = exportSelect.value;
-  if (!format) return;
-
-  const year = yearSelect.value;
-  if (!loadedYears.has(String(year))) return;
-
-  // SVG + JSON -> text copy
-  if (format === "svg") {
-    const svgText = currentSvgText();
-    if (!svgText) return;
-    await navigator.clipboard.writeText(svgText);
-    showToast("Copied SVG to clipboard.");
-    return;
-  }
-
-  if (format === "json") {
-    const obj = getCurrentJsonObject();
-    if (!obj) return;
-    await navigator.clipboard.writeText(JSON.stringify(obj, null, 2));
-    showToast("Copied JSON to clipboard.");
-    return;
-  }
-
-  // PNG -> image copy (may not be supported in all browsers)
-  if (format === "png") {
-    setGraphSpinner(true, "Copying PNG…");
-    try {
-      const blob = await getCurrentPngBlob();
-      if (!blob) return;
-
-      if (!navigator.clipboard || !navigator.clipboard.write) {
-        showToast("Copying images isn’t supported in this browser. Use Download.");
-        return;
+    if (format === "png") {
+      setGraphSpinner(true, "Preparing PNG…");
+      try {
+        const blob = await getCurrentPngBlob();
+        if (!blob) return;
+        downloadBlob(blob, `${currentUsername}_${year}_${themeNameSafe}.png`);
+      } finally {
+        setGraphSpinner(false);
       }
-
-      const item = new ClipboardItem({ [blob.type]: blob });
-      await navigator.clipboard.write([item]);
-      showToast("Copied PNG image to clipboard.");
-    } catch (err) {
-      console.error(err);
-      showToast("Could not copy PNG. Try Download instead.");
-    } finally {
-      setGraphSpinner(false);
+      return;
     }
-    return;
+
+    if (format === "json") {
+      const obj = getCurrentJsonObject();
+      if (!obj) return;
+      downloadJSON(obj, `${currentUsername}_${year}_${themeNameSafe}.json`);
+      return;
+    }
   }
-}
 
-exportDownloadBtn.addEventListener("click", () => {
-  doDownloadSelectedType();
-});
+  async function doCopySelectedType() {
+    const format = exportSelect.value;
+    if (!format) return;
 
-exportCopyBtn.addEventListener("click", () => {
-  doCopySelectedType();
-});
+    const year = yearSelect.value;
+    if (!loadedYears.has(String(year))) return;
+
+    // SVG + JSON -> text copy
+    if (format === "svg") {
+      const svgText = currentSvgText();
+      if (!svgText) return;
+      await navigator.clipboard.writeText(svgText);
+      showToast("Copied SVG to clipboard.");
+      return;
+    }
+
+    if (format === "json") {
+      const obj = getCurrentJsonObject();
+      if (!obj) return;
+      await navigator.clipboard.writeText(JSON.stringify(obj, null, 2));
+      showToast("Copied JSON to clipboard.");
+      return;
+    }
+
+    // PNG -> image copy (may not be supported in all browsers)
+    if (format === "png") {
+      setGraphSpinner(true, "Copying PNG…");
+      try {
+        const blob = await getCurrentPngBlob();
+        if (!blob) return;
+
+        if (!navigator.clipboard || !navigator.clipboard.write) {
+          showToast(
+            "Copying images isn’t supported in this browser. Use Download.",
+          );
+          return;
+        }
+
+        const item = new ClipboardItem({ [blob.type]: blob });
+        await navigator.clipboard.write([item]);
+        showToast("Copied PNG image to clipboard.");
+      } catch (err) {
+        console.error(err);
+        showToast("Could not copy PNG. Try Download instead.");
+      } finally {
+        setGraphSpinner(false);
+      }
+      return;
+    }
+  }
+
+  exportDownloadBtn.addEventListener("click", () => {
+    doDownloadSelectedType();
+  });
+
+  exportCopyBtn.addEventListener("click", () => {
+    doCopySelectedType();
+  });
 
   themeSelect.addEventListener("change", renderSelected);
   yearSelect.addEventListener("change", renderSelected);

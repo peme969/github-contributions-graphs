@@ -769,169 +769,430 @@ body {
     color: #8b949e;
 }
 .export-actions {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 8px;
-  align-items: center;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    align-items: center;
 }
 .btn-icon {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border-radius: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-icon svg {
-  display: block;
-  width: 16px;
-  height: 16px;
+    display: block;
+    width: 16px;
+    height: 16px;
 }
 
 .btn-icon:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 /* ---------- Mobile-friendly layout ---------- */
 :root {
-  --gap: 16px;
-  --radius: 14px;
+    --gap: 16px;
+    --radius: 14px;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 .app {
-  display: grid;
-  grid-template-columns: 1fr 360px; /* desktop default */
-  gap: var(--gap);
-  align-items: start;
-  padding: var(--gap);
-  min-height: 100dvh;
+    display: grid;
+    grid-template-columns: 1fr 360px; /* desktop default */
+    gap: var(--gap);
+    align-items: start;
+    padding: var(--gap);
+    min-height: 100dvh;
 }
 
 /* Ensure panes can shrink properly */
 .left-pane,
 .right-pane {
-  min-width: 0;
+    min-width: 0;
 }
 
 /* Make the graph area behave on small screens */
 .graph-display {
-  width: 100%;
-  max-width: 100%;
-  overflow: auto;                 /* allows horizontal scroll if SVG is wide */
-  -webkit-overflow-scrolling: touch;
-  border-radius: var(--radius);
+    width: 100%;
+    max-width: 100%;
+    overflow: auto; /* allows horizontal scroll if SVG is wide */
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius);
 }
 
 /* If SVG is larger than the viewport, allow panning */
 .svg-wrap {
-  min-width: max-content;
+    min-width: max-content;
 }
 
 /* Controls: wrap instead of squishing */
 .graph-controls {
-  display: grid;
-  grid-template-columns: 1fr;     /* will become 2 columns on wider screens */
-  gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr; /* will become 2 columns on wider screens */
+    gap: 10px;
 }
 
 /* Make selects/inputs/buttons easy to tap */
 .select,
 .input,
 .btn {
-  width: 100%;
-  min-height: 44px;               /* comfortable touch target */
-  font-size: 16px;                /* prevents iOS zoom on focus */
+    width: 100%;
+    min-height: 44px; /* comfortable touch target */
+    font-size: 16px; /* prevents iOS zoom on focus */
 }
 
 /* Export row: keep buttons usable on mobile */
 .export-actions {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 10px;
-  align-items: center;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
 }
 
 .btn.btn-icon {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  display: inline-grid;
-  place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    display: inline-grid;
+    place-items: center;
 }
 
 /* Username row: stack on very small screens */
 .username-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: center;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
 }
 
 /* ---------- Breakpoints ---------- */
 
 /* Tablet and down */
 @media (max-width: 900px) {
-  .app {
-    grid-template-columns: 1fr;   /* stack panes */
-  }
+    .app {
+        grid-template-columns: 1fr; /* stack panes */
+    }
 
-  .right-pane {
-    order: -1;                    /* put controls on top */
-  }
+    .right-pane {
+        order: -1; /* put controls on top */
+    }
 
-  .graph-controls {
-    grid-template-columns: 1fr 1fr; /* 2 columns for controls when possible */
-    column-gap: 12px;
-  }
+    .graph-controls {
+        grid-template-columns: 1fr 1fr; /* 2 columns for controls when possible */
+        column-gap: 12px;
+    }
 
-  /* Labels align nicely above controls in grid */
-  .control-label {
-    margin-top: 4px;
-  }
+    /* Labels align nicely above controls in grid */
+    .control-label {
+        margin-top: 4px;
+    }
 }
 
 /* Small phones */
 @media (max-width: 520px) {
-  .app {
-    padding: 12px;
-    gap: 12px;
-  }
+    .app {
+        padding: 12px;
+        gap: 12px;
+    }
 
-  .graph-controls {
-    grid-template-columns: 1fr;   /* single column */
-  }
+    .graph-controls {
+        grid-template-columns: 1fr; /* single column */
+    }
 
-  .username-row {
-    grid-template-columns: 1fr;   /* stack input + button */
-  }
+    .username-row {
+        grid-template-columns: 1fr; /* stack input + button */
+    }
 
-  #loadBtn {
-    width: 100%;
-  }
+    #loadBtn {
+        width: 100%;
+    }
 
-  .export-actions {
-    grid-template-columns: 1fr 44px 44px;
-  }
+    .export-actions {
+        grid-template-columns: 1fr 44px 44px;
+    }
 }
 
 /* Optional: reduce motion preference for spinners/animations */
 @media (prefers-reduced-motion: reduce) {
-  .spinner,
-  .btn-spinner {
-    animation: none !important;
-  }
+    .spinner,
+    .btn-spinner {
+        animation: none !important;
+    }
 }
 .svg-wrap svg {
-  height: auto;
-  max-width: 100%;
+    height: auto;
+    max-width: 100%;
 }
 @media (min-width: 901px) {
-  .right-pane {
-    position: sticky;
-    top: var(--gap);
+    .right-pane {
+        position: sticky;
+        top: var(--gap);
+    }
+}
+/* The area that holds the SVG */
+.graph-display {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden; /* no sideways scroll by default */
+}
+
+/* The wrapper you create in JS */
+.svg-wrap {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Make the generated SVG auto-fit the container width */
+.svg-wrap svg {
+    display: block; /* removes inline gaps */
+    width: 100% !important; /* force responsive width */
+    height: auto !important; /* preserve aspect ratio */
+    max-width: 100%;
+}
+
+/* On very small screens, you can choose to allow horizontal scroll instead of shrinking too tiny */
+@media (max-width: 520px) {
+    .graph-display {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Optional: keep it from becoming unreadably small on phones */
+    .svg-wrap {
+        min-width: 680px; /* tweak: 640–900 depending on your SVG */
+    }
+}
+
+/* ---------------- Mobile: stack + make graph full width ---------------- */
+@media (max-width: 900px) {
+    .app {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 12px;
+    }
+
+    /* Put the right pane (controls/sidebar) on top */
+    .right-pane {
+        order: -1;
+        width: 100%;
+    }
+
+    .left-pane {
+        width: 100%;
+    }
+
+    /* THIS is the main fix: stop side-by-side graph + controls */
+    .graph-and-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    /* Graph must be full width */
+    .graph-display {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Controls must also be full width, under the graph */
+    .graph-controls {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr; /* single column on mobile */
+        gap: 10px;
+    }
+
+    /* Make form controls comfortable on phones */
+    .select,
+    .input,
+    .btn {
+        width: 100%;
+        min-height: 44px;
+        font-size: 16px; /* avoids iOS zoom */
+    }
+
+    /* Export row: select + 2 icon buttons */
+    .export-actions {
+        display: grid;
+        grid-template-columns: 1fr 44px 44px;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .btn.btn-icon {
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+    }
+}
+
+/* ---------------- Small phones: keep SVG readable (choose ONE behavior) ---------------- */
+
+/* Option A (recommended): allow horizontal swipe so the graph stays legible */
+@media (max-width: 520px) {
+    .graph-display {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Prevent the SVG from shrinking into illegibility */
+    .svg-wrap {
+        min-width: 740px; /* tweak: 680–900 depending on your SVG */
+    }
+}
+
+/* Option B (no scroll): always shrink to fit (remove Option A block above if you prefer this) */
+/*
+@media (max-width: 520px) {
+  .graph-display { overflow: hidden; }
+  .svg-wrap svg {
+    width: 100% !important;
+    height: auto !important;
   }
+}
+*/
+/* ===== Mobile hard override: use the full screen width ===== */
+@media (max-width: 600px) {
+    /* Kill any desktop max-width centering */
+    body {
+        margin: 0;
+    }
+
+    .app {
+        width: 100%;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch; /* IMPORTANT */
+    }
+
+    /* Make both panes truly full width */
+    .left-pane,
+    .right-pane,
+    .left-center,
+    .left-center > * {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+    }
+
+    /* Ensure the sidebar card isn't constrained */
+    .right-pane {
+        order: -1;
+    }
+
+    /* If you have any "card" or "panel" containers, they must stretch */
+    .graph-and-controls,
+    .graph-controls,
+    .username-row,
+    .progress-wrap {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    /* Graph: full width and readable */
+    .graph-display {
+        width: 100% !important;
+        max-width: none !important;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Controls: full width and tap-friendly */
+    .select,
+    .input,
+    .btn {
+        width: 100% !important;
+        min-height: 44px;
+        font-size: 16px;
+    }
+
+    /* Export row: select + icons */
+    .export-actions {
+        display: grid;
+        grid-template-columns: 1fr 44px 44px;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .btn.btn-icon {
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+    }
+}
+/* ===== SVG auto-fit: no horizontal scrolling ===== */
+
+.graph-display {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden; /* 🚫 no scroll */
+}
+
+.svg-wrap {
+    width: 100%;
+    max-width: 100%;
+}
+
+.svg-wrap svg {
+    display: block;
+    width: 100% !important; /* fill container */
+    height: auto !important; /* preserve aspect ratio */
+    max-width: 100%;
+}
+@media (max-width: 600px) {
+    .app {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        max-width: none;
+        padding: 12px;
+    }
+
+    .left-pane,
+    .right-pane,
+    .left-center,
+    .graph-and-controls {
+        width: 100%;
+        max-width: none;
+    }
+
+    /* Stack graph ABOVE controls */
+    .graph-and-controls {
+        flex-direction: column;
+    }
+}
+.graph-display {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden; /* no horizontal scroll */
+}
+
+.svg-wrap,
+.svg-wrap svg {
+    width: 100%;
+    max-width: 100%;
+}
+
+.svg-wrap svg {
+    height: auto;
+    display: block;
 }
